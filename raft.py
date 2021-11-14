@@ -82,6 +82,7 @@ class Raft:
         msg=msg.split()
                 
         #modify2
+        print(msg)
         if msg[0]=='LOG':
             print("entering LOG...")
             content=msg[1]
