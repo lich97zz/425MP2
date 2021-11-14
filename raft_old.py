@@ -53,16 +53,21 @@ class Raft:
     def stepdown(self,term):
         self.term=term
         print(f'STATE',f'term={self.term}')
+
+        self.state='"FOLLOWER"'
+        print(f'STATE',f'state={self.state}')
         
         self.votedFor=None
         self.voteGranted=[False]*self.n
-        self.state='"FOLLOWER"'
-        print(f'STATE',f'state={self.state}')
         #todo: check this in heartbeat thread
         #  if self.heartbeat:
         #     self.heartbeat.cancel()
         
 
+
+        
+
+    
     def send(self,destpid,*args):
         print('SEND',destpid,*args,flush=True)
     
@@ -83,9 +88,6 @@ class Raft:
         
         term=int(msg[3])
 
-##        def receivePrint():
-##            print('SEND',destpid,*args,flush=True)
-        
         if self.term<term:
             self.stepdown(term)
 
@@ -148,8 +150,7 @@ class Raft:
 
     def heartbeatThread(self,term):
         l.acquire()
-        #modify1, LEADER
-        while self.term==term and self.state=='"LEADER"':
+        while self.term==term:
             for i in range(self.n):
                 if i!=self.pid:
                     self.send(i,'AppendEntries',self.term)
