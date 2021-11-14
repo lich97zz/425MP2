@@ -28,6 +28,8 @@ class Raft:
         self.n=n
         self.pid=pid
         self.leader=None
+
+        self.log=[]#modify2
         
         self.votedFor=pid
         self.term=0
@@ -82,9 +84,6 @@ class Raft:
         msgtype=msg[2]
         
         term=int(msg[3])
-
-##        def receivePrint():
-##            print('SEND',destpid,*args,flush=True)
         
         if self.term<term:
             self.stepdown(term)
@@ -116,6 +115,7 @@ class Raft:
         if msgtype=='AppendEntries':
             
             success=False
+
             if self.term==term:
                 self.state='"FOLLOWER"'
                 print(f'STATE',f'state={self.state}')
@@ -180,7 +180,6 @@ class Raft:
 
 
 r=Raft(n,pid)
-
 
 r.msgHandler()
 
