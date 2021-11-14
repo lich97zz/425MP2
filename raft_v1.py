@@ -186,7 +186,18 @@ class Raft:
         while self.term==term:
             for i in range(self.n):
                 if i!=self.pid:
-                    self.send(i,'AppendEntries',self.term)
+                    #modify3, 
+                    #self.send(i,'AppendEntries',self.term)
+                    if self.nextId[i] > len(self.log):
+                        continue
+                    prevId = self.nextId[i] - 1
+                    lastId = len(self.log)
+                    if self.matchId[i] <= self.nextId[i]:
+                        lastId = prevId
+                    prevTerm = self.logTerm(self.log, prevId)
+                    entry = self.log[prevId:lastId]
+                    commitId = min(self.commitId, lastId)
+                    self.send(i,'AppendEntries',self.term, prevId, prevTerm, entry, commitId)
             l.release()
             time.sleep(self.ELECTION_TIMEOUT/4)
             l.acquire()
