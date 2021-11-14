@@ -229,10 +229,11 @@ class Raft:
 
 
     def msgHandler(self):
-        print("msgHandler entered")
+        print("************enter handler")
         while msg:=sys.stdin.readline():
             l.acquire()
             self.processmsg(msg)
+            print("************release pos1")
             l.release()
 
 
@@ -287,9 +288,9 @@ class Raft:
         l.release()
 
 
-
+print("Init start")
 r=Raft(n,pid)
-
+print("Init finished")
 r.msgHandler()
 
 

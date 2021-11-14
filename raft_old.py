@@ -141,10 +141,11 @@ class Raft:
 
 
     def msgHandler(self):
-
+        print("************enter handler")
         while msg:=sys.stdin.readline():
             l.acquire()
             self.processmsg(msg)
+            print("************release pos1")
             l.release()
 
 
@@ -158,6 +159,7 @@ class Raft:
             l.release()
             time.sleep(self.ELECTION_TIMEOUT/4)
             l.acquire()
+            
         l.release()
 
     def timeoutHandlerThread(self):
