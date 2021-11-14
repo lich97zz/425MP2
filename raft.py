@@ -80,13 +80,25 @@ class Raft:
 
     def processmsg(self,msg):
         msg=msg.split()
-        srcpid=int(msg[1])
-        msgtype=msg[2]
-        
-        term=int(msg[3])
-        
+
+        #modify2, move stepdown upward
         if self.term<term:
             self.stepdown(term)
+            
+        #modify2
+        if msgtype=='LOG':
+            print("entering LOG...")
+            content=msg[1]
+            print("content = ",content)
+            self.log.append(content)
+            print('STATE log['+str(len(self.log))+']=['+str(self.term)+',"'+content+'"]' )
+            return
+            
+        srcpid=int(msg[1])
+        msgtype=msg[2]
+        term=int(msg[3])
+        
+        
 
         if msgtype=='RequestVotes':
             
