@@ -79,6 +79,7 @@ class Raft:
         self.heartbeat.start()
 
     def processmsg(self,msg):
+        print("processing msg")
         msg=msg.split()
                 
         #modify2
