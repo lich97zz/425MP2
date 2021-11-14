@@ -33,7 +33,7 @@ class Process:
             while True:
                 line = await self.subproc.stdout.readline()
                 #modify2
-##                print(line)
+                print(line)
                 await alog.log(DEBUG, f"{self.pid}>{line.decode().strip()}")
                 if not line:
                     break
