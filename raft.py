@@ -261,6 +261,7 @@ class Raft:
         l.release()
 
     def timeoutHandlerThread(self):
+        print("in timeout handler thread")
         l.acquire()
         if self.timer==threading.current_thread():
             self.resetTimer()
