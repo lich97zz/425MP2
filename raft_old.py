@@ -22,6 +22,7 @@ l=threading.Lock()
 
 class Raft:
     def __init__(self,n,pid):
+        print("entering Raft init")
         self.state='"FOLLOWER"'
         print(f'STATE',f'state={self.state}')
 

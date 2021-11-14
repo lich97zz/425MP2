@@ -22,6 +22,7 @@ l=threading.Lock()
 
 class Raft:
     def __init__(self,n,pid):
+        print("entering Raft init")
         self.state='"FOLLOWER"'
         print(f'STATE',f'state={self.state}')
 
@@ -228,7 +229,7 @@ class Raft:
 
 
     def msgHandler(self):
-
+        print("msgHandler entered")
         while msg:=sys.stdin.readline():
             l.acquire()
             self.processmsg(msg)
