@@ -141,7 +141,7 @@ class Raft:
 
             agree = (msg[4]=='True')
             print("received RVR, agree=",agree)
-            print(self.state, term, self.term)
+##            print(self.state, term, self.term)
             if agree and self.state=='"CANDIDATE"' and term==self.term:
                 
                 self.voteGranted[srcpid]=agree
@@ -186,18 +186,7 @@ class Raft:
         while self.term==term:
             for i in range(self.n):
                 if i!=self.pid:
-                    #modify3, 
-                    #self.send(i,'AppendEntries',self.term)
-                    if self.nextId[i] > len(self.log):
-                        continue
-                    prevId = self.nextId[i] - 1
-                    lastId = len(self.log)
-                    if self.matchId[i] <= self.nextId[i]:
-                        lastId = prevId
-                    prevTerm = self.logTerm(self.log, prevId)
-                    entry = self.log[prevId:lastId]
-                    commitId = min(self.commitId, lastId)
-                    self.send(i,'AppendEntries',self.term, prevId, prevTerm, entry, commitId)
+                    self.send(i,'AppendEntries',self.term)
             l.release()
             time.sleep(self.ELECTION_TIMEOUT/4)
             l.acquire()
