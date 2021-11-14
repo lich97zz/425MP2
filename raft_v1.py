@@ -22,7 +22,6 @@ l=threading.Lock()
 
 class Raft:
     def __init__(self,n,pid):
-        print("entering Raft init")
         self.state='"FOLLOWER"'
         print(f'STATE',f'state={self.state}')
 
@@ -172,11 +171,9 @@ class Raft:
 
 
     def msgHandler(self):
-        print("************enter handler")
         while msg:=sys.stdin.readline():
             l.acquire()
             self.processmsg(msg)
-            print("************release pos1")
             l.release()
 
 
@@ -219,7 +216,11 @@ class Raft:
             self.voteGranted[self.pid]=True
             for i in range(self.n):
                 if i!=self.pid:
-                    self.send(i,'RequestVotes',self.term)
+                    #modify3
+                    lastLogTerm = self.logTerm(self.log, len(self.log))
+                    lastLogId = len(self.log)
+                    print("sending request Votes,",self.term,lastLogTerm,lastLogId)
+                    self.send(i,'RequestVotes',self.term,lastLogTerm,lastLogId)
 
         l.release()
 
