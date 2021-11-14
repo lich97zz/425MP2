@@ -80,11 +80,7 @@ class Raft:
 
     def processmsg(self,msg):
         msg=msg.split()
-
-        #modify2, move stepdown upward
-        if self.term<term:
-            self.stepdown(term)
-            
+                
         #modify2
         if msgtype=='LOG':
             print("entering LOG...")
@@ -98,7 +94,8 @@ class Raft:
         msgtype=msg[2]
         term=int(msg[3])
         
-        
+        if self.term<term:
+            self.stepdown(term)
 
         if msgtype=='RequestVotes':
             
