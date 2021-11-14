@@ -150,9 +150,16 @@ class Raft:
                     self.becomeLeader()
 
         if msgtype=='AppendEntries':
-            
+            prevId = msg[4]
+            prevTerm = msg[5]
+            entry = msg[6]
+            commitId = msg[7]
+
             success=False
+            matchId = 0
+
             if self.term==term:
+                self.resetTimer()
                 self.state='"FOLLOWER"'
                 print(f'STATE',f'state={self.state}')
                 
@@ -160,12 +167,23 @@ class Raft:
                     self.leader=srcpid
                     print(f'STATE',f'leader={self.leader}')
                 
+            #modify3
+                cond1 = (prevId==0)
+                cond2 = (prevId<=len(self.log) and (self.logTerm(self.log, prevId)==prevTerm))
+                if cond1 or cond2:
+                    success=True
+                    ind = prevId
+                    for i in range(len(entry)):
+                        ind+=1
+                        if self.logTerm(self.log, ind) != entry[i].term:
+                            while len(self.log) >= ind:
+                                self.log = self.log[:-1]
+                            self.log.push(entry[i])
+                    matchId = ind
+                    self.commitId = max(self.commitId, commitId)
                 
-
-                success=True
-                self.resetTimer()
             
-            self.send(srcpid,'AppendEntriesResponse',self.term,success)
+            self.send(srcpid,'AppendEntriesResponse',self.term,success, matchId)
 
         if msgtype=='AppendEntriesResponse':
             pass
@@ -183,14 +201,25 @@ class Raft:
 
     def heartbeatThread(self,term):
         l.acquire()
+        #modify3, heartbeat time reset
         while self.term==term:
             for i in range(self.n):
                 if i!=self.pid:
-                    self.send(i,'AppendEntries',self.term)
+                    #modify3, 
+                    #self.send(i,'AppendEntries',self.term)
+                    if self.nextId[i] > len(self.log):
+                        continue
+                    prevId = self.nextId[i] - 1
+                    lastId = len(self.log)
+                    if self.matchId[i] <= self.nextId[i]:
+                        lastId = prevId
+                    prevTerm = self.logTerm(self.log, prevId)
+                    entry = self.log[prevId:lastId]
+                    commitId = min(self.commitId, lastId)
+                    self.send(i,'AppendEntries',self.term, prevId, prevTerm, entry, commitId)
             l.release()
             time.sleep(self.ELECTION_TIMEOUT/4)
             l.acquire()
-            
         l.release()
 
     def timeoutHandlerThread(self):
