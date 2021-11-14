@@ -204,7 +204,7 @@ class Raft:
     def heartbeatThread(self,term):
         l.acquire()
         #modify3, heartbeat time reset
-        while self.term==term and self.status=='"LEADER"'::
+        while self.term==term and self.status=='"LEADER"':
             for i in range(self.n):
                 if i!=self.pid:
                     #modify3, 
