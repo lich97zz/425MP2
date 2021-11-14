@@ -140,6 +140,8 @@ class Raft:
         if msgtype=='RequestVotesResponse':
 
             agree = (msg[4]=='True')
+            print("received RVR, agree=",agree)
+            print(self.state, term, self.term)
             if agree and self.state=='"CANDIDATE"' and term==self.term:
                 
                 self.voteGranted[srcpid]=agree

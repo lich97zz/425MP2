@@ -22,9 +22,9 @@ async def elect_leader(n, group):
         await alog.log(ERROR, "### Error!  more than 1 term with a leader despite no failures!")
         await alog.log(ERROR, f"Leaders: {group.leaders}")
         raise RuntimeError("More than 1 leader term")
-    print("(*&(*!@inside raft_election_test")
-    print(group.leaders.items())
-    print(group.leaders)
+##    print("(*&(*!@inside raft_election_test")
+##    print(group.leaders.items())
+##    print(group.leaders)
     term, leader = max(group.leaders.items())
     await alog.log(INFO, f"# Successfully elected {leader} for term {term}")
 

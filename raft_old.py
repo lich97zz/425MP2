@@ -22,7 +22,6 @@ l=threading.Lock()
 
 class Raft:
     def __init__(self,n,pid):
-        print("entering Raft init")
         self.state='"FOLLOWER"'
         print(f'STATE',f'state={self.state}')
 
@@ -110,6 +109,8 @@ class Raft:
         if msgtype=='RequestVotesResponse':
 
             agree = (msg[4]=='True')
+            print("received RVR, agree=",agree)
+            print(self.state, term, self.term)
             if agree and self.state=='"CANDIDATE"' and term==self.term:
                 
                 self.voteGranted[srcpid]=agree
@@ -141,11 +142,9 @@ class Raft:
 
 
     def msgHandler(self):
-        print("************enter handler")
         while msg:=sys.stdin.readline():
             l.acquire()
             self.processmsg(msg)
-            print("************release pos1")
             l.release()
 
 
