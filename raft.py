@@ -143,8 +143,8 @@ class Raft:
             
             if self.term==term and (self.votedFor in {None,srcpid}):
                 #modify
-                cond1 = (lastLogTerm>logTerm(self.log,len(self.log)))
-                cond2 = (lastLogTerm==logTerm(self.log,len(self.log))) and (lastLogId>len(self.log))
+                cond1 = (lastLogTerm>self.logTerm(self.log,len(self.log)))
+                cond2 = (lastLogTerm==self.logTerm(self.log,len(self.log))) and (lastLogId>len(self.log))
                 if cond1 or cond2:
                 
                     agree=True
@@ -188,13 +188,13 @@ class Raft:
                 
             #modify3
                 cond1 = (prevId==0)
-                cond2 = (prevId<=len(self.log) and (logTerm(self.log, prevId)==prevTerm))
+                cond2 = (prevId<=len(self.log) and (self.logTerm(self.log, prevId)==prevTerm))
                 if cond1 or cond2:
                     success=True
                     ind = prevId
                     for i in range(len(entry)):
                         ind+=1
-                        if logTerm(self.log, ind) != entry[i].term:
+                        if self.logTerm(self.log, ind) != entry[i].term:
                             while len(self.log) >= ind:
                                 self.log = self.log[:-1]
                             self.log.push(entry[i])
@@ -272,7 +272,7 @@ class Raft:
             for i in range(self.n):
                 if i!=self.pid:
                     #modify3
-                    lastLogTerm = logTerm(self.log, len(self.log))
+                    lastLogTerm = self.logTerm(self.log, len(self.log))
                     lastLogId = len(self.log)
                     self.send(i,'RequestVotes',self.term,lastLogTerm,lastLogId)
 ##                    self.send(i,'RequestVotes',self.term)
