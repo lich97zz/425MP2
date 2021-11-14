@@ -143,13 +143,16 @@ class Raft:
             
             if self.term==term and (self.votedFor in {None,srcpid}):
                 #modify
-                cond1 = (lastLogTerm>self.logTerm(self.log,len(self.log)))
-                cond2 = (lastLogTerm==self.logTerm(self.log,len(self.log))) and (lastLogId>len(self.log))
-                if cond1 or cond2:
-                
-                    agree=True
-                    self.votedFor=srcpid
-                    self.resetTimer()
+##                cond1 = (lastLogTerm>self.logTerm(self.log,len(self.log)))
+##                cond2 = (lastLogTerm==self.logTerm(self.log,len(self.log))) and (lastLogId>len(self.log))
+##                if cond1 or cond2:
+##                
+##                    agree=True
+##                    self.votedFor=srcpid
+##                    self.resetTimer()
+                agree=True
+                self.votedFor=srcpid
+                self.resetTimer()
             
             self.send(srcpid,'RequestVotesResponse',self.term,agree)
 
