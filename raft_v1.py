@@ -159,13 +159,15 @@ class Raft:
             matchId = 0
 
             if self.term==term:
-                self.resetTimer()
+                
                 self.state='"FOLLOWER"'
                 print(f'STATE',f'state={self.state}')
                 
                 if self.leader!=srcpid:
                     self.leader=srcpid
                     print(f'STATE',f'leader={self.leader}')
+
+                self.resetTimer()
                 
             #modify3
                 cond1 = (prevId==0)
@@ -216,6 +218,7 @@ class Raft:
                     prevTerm = self.logTerm(self.log, prevId)
                     entry = self.log[prevId:lastId]
                     commitId = min(self.commitId, lastId)
+                    print("***INFO,",pid,",is sending heartbeat to,",i)
                     self.send(i,'AppendEntries',self.term, prevId, prevTerm, entry, commitId)
             l.release()
             time.sleep(self.ELECTION_TIMEOUT/4)
