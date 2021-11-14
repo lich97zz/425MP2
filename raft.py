@@ -134,6 +134,7 @@ class Raft:
             self.stepdown(term)
 
         if msgtype=='RequestVotes':
+            print("entering requestVotes handler")
 ##self.send(i,'RequestVotes',self.term,lastLogTerm,LastLogId)
             #modify
             lastLogTerm = msg[4]
@@ -277,6 +278,7 @@ class Raft:
                     #modify3
                     lastLogTerm = self.logTerm(self.log, len(self.log))
                     lastLogId = len(self.log)
+                    print("sending request Votes,",self.term,lastLogTerm,lastLogId)
                     self.send(i,'RequestVotes',self.term,lastLogTerm,lastLogId)
 ##                    self.send(i,'RequestVotes',self.term)
 
