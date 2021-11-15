@@ -280,7 +280,7 @@ class Raft:
                     entry = self.log[prevId:lastId]
                     content = self.logcontent[prevId:lastId]
                     commitId = min(self.commitId, lastId)
-                    
+                    print("(((((,entry=",entry)
                     self.send(i,'AppendEntries',self.term, prevId, prevTerm, entry, content, commitId)
             l.release()
             time.sleep(self.ELECTION_TIMEOUT/4)
