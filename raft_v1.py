@@ -241,7 +241,7 @@ class Raft:
                 if self.state=='"LEADER"' and self.logTerm(self.log,ind)==self.term:
                     print("*********************Entered")
                     oldCommitId = self.commitId
-                    self.commitId = max(self.commitId, ind)+1
+                    self.commitId = max(self.commitId, ind+1)
                     
                     if self.commitId > oldCommitId:
                         print('STATE commitIndex='+str(self.commitId))
