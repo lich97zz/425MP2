@@ -116,7 +116,7 @@ class Raft:
 ##self.send(i,'RequestVotes',self.term,lastLogTerm,LastLogId)
             #modify
             lastLogTerm = int(msg[4])
-            lastLogId = msg[5]
+            lastLogId = int(msg[5])
             
             agree=False
             
@@ -167,11 +167,11 @@ class Raft:
 ##            
 ##            self.send(srcpid,'AppendEntriesResponse',self.term,success)
         if msgtype=='AppendEntries':
-            prevId = msg[4]
-            prevTerm = msg[5]
+            prevId = int(msg[4])
+            prevTerm = int(msg[5])
             entry = msg[6]
             print("*****Entry:",entry)
-            commitId = msg[7]
+            commitId = int(msg[7])
 
             success=False
             matchId = 0
