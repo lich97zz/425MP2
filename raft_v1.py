@@ -115,25 +115,25 @@ class Raft:
             print("entering requestVotes handler")
 ##self.send(i,'RequestVotes',self.term,lastLogTerm,LastLogId)
             #modify
-            lastLogTerm = int(msg[4])
-            lastLogId = int(msg[5])
+##            lastLogTerm = int(msg[4])
+##            lastLogId = int(msg[5])
             
             agree=False
             
             if self.term==term and (self.votedFor in {None,srcpid}):
                 #modify
                 
-                print("****info:",lastLogTerm,self.logTerm(self.log,len(self.log)))
-                cond1 = (lastLogTerm > self.logTerm(self.log,len(self.log)))
-                cond2 = (lastLogTerm==self.logTerm(self.log,len(self.log))) and (lastLogId>len(self.log))
-                if cond1 or cond2:
-                
-                    agree=True
-                    self.votedFor=srcpid
-                    self.resetTimer()
-##                agree=True
-##                self.votedFor=srcpid
-##                self.resetTimer()
+##                print("****info:",lastLogTerm,self.logTerm(self.log,len(self.log)))
+##                cond1 = (lastLogTerm > self.logTerm(self.log,len(self.log)))
+##                cond2 = (lastLogTerm==self.logTerm(self.log,len(self.log))) and (lastLogId>len(self.log))
+##                if cond1 or cond2:
+##                
+##                    agree=True
+##                    self.votedFor=srcpid
+##                    self.resetTimer()
+                agree=True
+                self.votedFor=srcpid
+                self.resetTimer()
             
             self.send(srcpid,'RequestVotesResponse',self.term,agree)
 
@@ -260,11 +260,11 @@ class Raft:
             for i in range(self.n):
                 if i!=self.pid:
                     #modify3
-                    lastLogTerm = self.logTerm(self.log, len(self.log))
-                    lastLogId = len(self.log)
-                    print("***info1",lastLogTerm)
-                    self.send(i,'RequestVotes',self.term,lastLogTerm,lastLogId)
-
+##                    lastLogTerm = self.logTerm(self.log, len(self.log))
+##                    lastLogId = len(self.log)
+##                    print("***info1",lastLogTerm)
+##                    self.send(i,'RequestVotes',self.term,lastLogTerm,lastLogId)
+                    self.send(i,'RequestVotes',self.term)
         l.release()
 
 
