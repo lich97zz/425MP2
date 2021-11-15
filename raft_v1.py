@@ -169,6 +169,7 @@ class Raft:
             prevId = msg[4]
             prevTerm = msg[5]
             entry = msg[6]
+            print("*****Entry:",entry)
             commitId = msg[7]
 
             success=False
@@ -260,6 +261,7 @@ class Raft:
                     #modify3
                     lastLogTerm = self.logTerm(self.log, len(self.log))
                     lastLogId = len(self.log)
+                    print("***info1",lastLogTerm)
                     self.send(i,'RequestVotes',self.term,lastLogTerm,lastLogId)
 
         l.release()
