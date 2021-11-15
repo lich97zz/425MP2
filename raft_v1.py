@@ -111,6 +111,27 @@ class Raft:
         infodict['matchId'] = self.matchId
         infodict['nextId'] = self.nextId
         print("info:",infodict)
+    def updateCommit(self):
+        matchIdTmp = list(self.matchId.values())
+        matchIdTmp[self.pid] = len(self.log)
+##                print(matchIdTmp)
+        matchIdTmp.sort()
+        ind = matchIdTmp[int(self.n/2)]
+##                print('------Trying to update...')
+##                print(matchIdTmp)
+##                print(ind)
+##                print(self.logTerm(self.log,ind), self.term)
+        if self.state=='"LEADER"' and self.logTerm(self.log,ind)==self.term:
+##                    print("*********************Entered")
+            oldCommitId = self.commitId
+            self.commitId = max(self.commitId, ind)
+##                    print(oldCommitId,self.commitId)
+            if self.commitId > oldCommitId:
+                print('STATE commitIndex='+str(self.commitId))
+                for i in range(oldCommitId+1, self.commitId+1):
+                    if i > len(self.log):
+                        break
+                    print('COMMITTED '+str(self.logcontent[i-1])+' '+str(i))
         
     def processmsg(self,msg):
         msg=msg.split()
@@ -224,43 +245,13 @@ class Raft:
                             self.log.append(entry[i])
                             self.logcontent.append(content[i])
                     matchId = ind
-            
+
+            self.updateCommit()
             self.send(srcpid,'AppendEntriesResponse',self.term,success, matchId)
-            oldCommitId = self.commitId
-            self.commitId = max(self.commitId, commitId)
-            if self.commitId > oldCommitId:
-                print("loginfo:",self.log,self.logcontent,self.commitId)
-                print('STATE commitIndex='+str(self.commitId))
-                for i in range(oldCommitId+1, self.commitId+1):
-                    if i > len(self.log):
-                        break
-##                    print('COMMITTED '+str(self.logcontent[i-1])+' '+str(i))
-                    print('COMMITTED '+str(self.logcontent[0])+' '+str(0))
+            
 
         if msgtype=='AppendEntriesResponse':
-            def updateCommit():
-                matchIdTmp = list(self.matchId.values())
-                matchIdTmp[self.pid] = len(self.log)
-##                print(matchIdTmp)
-                matchIdTmp.sort()
-                ind = matchIdTmp[int(self.n/2)]
-##                print('------Trying to update...')
-##                print(matchIdTmp)
-##                print(ind)
-##                print(self.logTerm(self.log,ind), self.term)
-                if self.state=='"LEADER"' and self.logTerm(self.log,ind)==self.term:
-##                    print("*********************Entered")
-                    oldCommitId = self.commitId
-                    self.commitId = max(self.commitId, ind)
-##                    print(oldCommitId,self.commitId)
-                    if self.commitId > oldCommitId:
-                        print('STATE commitIndex='+str(self.commitId))
-                        for i in range(oldCommitId+1, self.commitId+1):
-                            if i > len(self.log):
-                                break
-                            print('COMMITTED '+str(self.logcontent[0])+' '+str(0))
-##                            print('COMMITTED '+str(self.logcontent[i-1])+' '+str(i))
-                
+            
 ##  self.send(srcpid,'AppendEntriesResponse',self.term,success, matchId)
             if self.state!='"LEADER"':
                 return
@@ -271,7 +262,7 @@ class Raft:
             if agree:
                 self.matchId[srcpid] = max(self.matchId[srcpid], matchId)
                 self.nextId[srcpid] = matchId+1
-                updateCommit()
+                self.updateCommit()
             else:
                 self.nextId[srcpid] = max(1, self.nextId[srcpid]-1)
             
