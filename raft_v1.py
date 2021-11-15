@@ -220,38 +220,27 @@ class Raft:
 
     def heartbeatThread(self,term):
         l.acquire()
-        while self.term==term:
-            print(self.pid,"sending a heartbeat")
+        #modify3, heartbeat time reset
+        while self.term==term and self.state=='"LEADER"':
             for i in range(self.n):
                 if i!=self.pid:
-                    self.send(i,'AppendEntries',self.term)
+                    #modify3, 
+                    #self.send(i,'AppendEntries',self.term)
+                    if self.nextId[i] > len(self.log):
+                        continue
+                    prevId = self.nextId[i] - 1
+                    lastId = len(self.log)
+                    if self.matchId[i] <= self.nextId[i]:
+                        lastId = prevId
+                    prevTerm = self.logTerm(self.log, prevId)
+                    entry = self.log[prevId:lastId]
+                    commitId = min(self.commitId, lastId)
+                    print("***INFO,",pid,",is sending heartbeat to,",i)
+                    self.send(i,'AppendEntries',self.term, prevId, prevTerm, entry, commitId)
             l.release()
             time.sleep(self.ELECTION_TIMEOUT/4)
             l.acquire()
-            
         l.release()
-##        l.acquire()
-##        #modify3, heartbeat time reset
-##        while self.term==term and self.state=='"LEADER"':
-##            for i in range(self.n):
-##                if i!=self.pid:
-##                    #modify3, 
-##                    #self.send(i,'AppendEntries',self.term)
-##                    if self.nextId[i] > len(self.log):
-##                        continue
-##                    prevId = self.nextId[i] - 1
-##                    lastId = len(self.log)
-##                    if self.matchId[i] <= self.nextId[i]:
-##                        lastId = prevId
-##                    prevTerm = self.logTerm(self.log, prevId)
-##                    entry = self.log[prevId:lastId]
-##                    commitId = min(self.commitId, lastId)
-##                    print("***INFO,",pid,",is sending heartbeat to,",i)
-##                    self.send(i,'AppendEntries',self.term, prevId, prevTerm, entry, commitId)
-##            l.release()
-##            time.sleep(self.ELECTION_TIMEOUT/4)
-##            l.acquire()
-##        l.release()
 
     def timeoutHandlerThread(self):
         print(self.pid,"entering timeout")
