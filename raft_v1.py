@@ -243,7 +243,7 @@ class Raft:
                     oldCommitId = self.commitId
                     self.commitId = max(self.commitId, ind)
                     
-                    if self.commitedId > oldCommitId:
+                    if self.commitId > oldCommitId:
                         print('STATE commitIndex='+str(self.commitId))
                         for i in range(oldCommitId+1, self.commitId+1):
                             if i >= len(self.log):
