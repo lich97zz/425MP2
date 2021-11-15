@@ -241,15 +241,15 @@ class Raft:
                 if self.state=='"LEADER"' and self.logTerm(self.log,ind)==self.term:
                     print("*********************Entered")
                     oldCommitId = self.commitId
-                    self.commitId = max(self.commitId, ind+1)
-                    
+                    self.commitId = max(self.commitId, ind)
+                    print(oldCommitId,self.commitId)
                     if self.commitId > oldCommitId:
                         print('STATE commitIndex='+str(self.commitId))
-                        for i in range(oldCommitId, self.commitId):
-                            if i >= len(self.log):
+                        for i in range(oldCommitId+1, self.commitId+1):
+                            if i > len(self.log):
                                 break
                             
-                            print('COMMITTED '+str(self.logcontent[i])+' '+str(i))
+                            print('COMMITTED '+str(self.logcontent[i-1])+' '+str(i))
                 
 ##  self.send(srcpid,'AppendEntriesResponse',self.term,success, matchId)
             if self.state!='"LEADER"':
