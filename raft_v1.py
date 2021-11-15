@@ -237,17 +237,17 @@ class Raft:
                     success=True
                     ind = prevId
 
-                    print("-----info1,",entry,ind)
-                    print("-----log,",self.log,self.logcontent)
+##                    print("-----info1,",entry,ind)
+##                    print("-----log,",self.log,self.logcontent)
                     for i in range(len(entry)):
                         ind+=1
-                        print("-----info2,",self.logTerm(self.log, ind),i)
+##                        print("-----info2,",self.logTerm(self.log, ind),i)
                         if self.logTerm(self.log, ind) != entry[i]:
                             while len(self.log) > ind-1:
                                 self.log = self.log[:-1]
 ##todo                                
                                 self.logcontent = self.logcontent[:-1]
-                            print("****info, logpushing:",entry[i],' ',content[i])
+                            print("****info, logpushing:",entry[i],' ',content[i],' at ',self.pid)
                             self.log.append(entry[i])
                             self.logcontent.append(content[i])
                     matchId = ind
@@ -287,7 +287,7 @@ class Raft:
                     entry = self.log[prevId:lastId]
                     content = self.logcontent[prevId:lastId]
                     commitId = min(self.commitId, lastId)
-                    print("(((((,entry=",entry)
+##                    print("(((((,entry=",entry)
                     self.send(i,'AppendEntries',self.term, prevId, prevTerm, entry, content, commitId)
             l.release()
             time.sleep(self.ELECTION_TIMEOUT/4)
