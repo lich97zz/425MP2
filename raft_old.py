@@ -152,7 +152,7 @@ class Raft:
 
     def heartbeatThread(self,term):
         l.acquire()
-        while self.term==term:
+        while self.term==term and self.state=='"LEADER"':
             print(self.pid,"sending a heartbeat")
             for i in range(self.n):
                 if i!=self.pid:
