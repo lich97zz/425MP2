@@ -241,10 +241,11 @@ class Raft:
                             while len(self.log) > ind-1:
                                 self.log = self.log[:-1]
                                 self.logcontent = self.logcontent[:-1]
-                            
+                            content[i] = content[i][1:-1] #remove the leading and tail '
                             print("****info, logpushing:",entry[i],' ',content[i],' at ',self.pid)
                             self.log.append(entry[i])
                             self.logcontent.append(content[i])
+                            
                             print('STATE log['+str(len(self.log))+']=['+str(self.term)+',"'+content[i]+'"]' )
                     matchId = ind
 
