@@ -135,7 +135,7 @@ class Raft:
 
         if msgtype=='RequestVotes':
             
-            print("entering requestVotes handler")
+##            print("entering requestVotes handler")
 ##self.send(i,'RequestVotes',self.term,lastLogTerm,LastLogId)
             #modify
 ##            lastLogTerm = int(msg[4])
@@ -173,6 +173,7 @@ class Raft:
                     self.becomeLeader()
                     
         if msgtype=='AppendEntries':
+            
             prevId = int(msg[4])
             prevTerm = int(msg[5])
             
@@ -223,18 +224,17 @@ class Raft:
                             self.log.append(entry[i])
                             self.logcontent.append(content[i])
                     matchId = ind
-                    
-                    oldCommitId = self.commitId
-                    self.commitId = max(self.commitId, commitId)
-                    if self.commitId > oldCommitId:
-                        print('STATE commitIndex='+str(self.commitId))
-                        for i in range(oldCommitId+1, self.commitId+1):
-                            if i > len(self.log):
-                                break
-                            
-                            print('COMMITTED '+str(self.logcontent[i-1])+' '+str(i))
             
             self.send(srcpid,'AppendEntriesResponse',self.term,success, matchId)
+            oldCommitId = self.commitId
+            self.commitId = max(self.commitId, commitId)
+            if self.commitId > oldCommitId:
+                print('STATE commitIndex='+str(self.commitId))
+                for i in range(oldCommitId+1, self.commitId+1):
+                    if i > len(self.log):
+                        break
+                    
+                    print('COMMITTED '+str(self.logcontent[i-1])+' '+str(i))
 
         if msgtype=='AppendEntriesResponse':
             def updateCommit():
