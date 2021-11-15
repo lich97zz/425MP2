@@ -267,12 +267,13 @@ class Raft:
 ##                        continue
                     prevId = self.nextId[i] - 1
                     lastId = min(prevId+1, len(self.log))
-                    if self.matchId[i] <= self.nextId[i]:
+                    if self.matchId[i] < self.nextId[i]-1:
                         lastId = prevId
                     prevTerm = self.logTerm(self.log, prevId)
                     entry = self.log[prevId:lastId]
                     content = self.logcontent[prevId:lastId]
                     commitId = min(self.commitId, lastId)
+                    
                     self.send(i,'AppendEntries',self.term, prevId, prevTerm, entry, content, commitId)
             l.release()
             time.sleep(self.ELECTION_TIMEOUT/4)
