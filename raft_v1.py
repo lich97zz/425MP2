@@ -111,6 +111,7 @@ class Raft:
         infodict['matchId'] = self.matchId
         infodict['nextId'] = self.nextId
         print("info:",infodict)
+        
     def updateCommit(self):
         matchIdTmp = list(self.matchId.values())
         matchIdTmp[self.pid] = len(self.log)
@@ -132,6 +133,8 @@ class Raft:
                     if i > len(self.log):
                         break
                     print('COMMITTED '+str(self.logcontent[i-1])+' '+str(i))
+                return True
+        return False
         
     def processmsg(self,msg):
         msg=msg.split()
@@ -242,14 +245,16 @@ class Raft:
                                 self.log = self.log[:-1]
                                 self.logcontent = self.logcontent[:-1]
                             content[i] = content[i][1:-1] #remove the leading and tail '
-                            print("****info, logpushing:",entry[i],' ',content[i],' at ',self.pid)
+##                            print("****info, logpushing:",entry[i],' ',content[i],' at ',self.pid)
                             self.log.append(entry[i])
                             self.logcontent.append(content[i])
                             
                             print('STATE log['+str(len(self.log))+']=['+str(self.term)+',"'+content[i]+'"]' )
                     matchId = ind
 
-            self.updateCommit()
+            b1 = self.updateCommit()
+            if (!b1):
+                print("-------appendEntry commit id change =",b1)
             self.send(srcpid,'AppendEntriesResponse',self.term,success, matchId)
             
 
