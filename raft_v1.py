@@ -121,16 +121,16 @@ class Raft:
             
             if self.term==term and (self.votedFor in {None,srcpid}):
                 #modify
-##                cond1 = (lastLogTerm>self.logTerm(self.log,len(self.log)))
-##                cond2 = (lastLogTerm==self.logTerm(self.log,len(self.log))) and (lastLogId>len(self.log))
-##                if cond1 or cond2:
-##                
-##                    agree=True
-##                    self.votedFor=srcpid
-##                    self.resetTimer()
-                agree=True
-                self.votedFor=srcpid
-                self.resetTimer()
+                cond1 = (lastLogTerm>self.logTerm(self.log,len(self.log)))
+                cond2 = (lastLogTerm==self.logTerm(self.log,len(self.log))) and (lastLogId>len(self.log))
+                if cond1 or cond2:
+                
+                    agree=True
+                    self.votedFor=srcpid
+                    self.resetTimer()
+##                agree=True
+##                self.votedFor=srcpid
+##                self.resetTimer()
             
             self.send(srcpid,'RequestVotesResponse',self.term,agree)
 
@@ -140,13 +140,10 @@ class Raft:
         if msgtype=='RequestVotesResponse':
 
             agree = (msg[4]=='True')
-            print("received RVR, agree=",agree)
-##            print(self.state, term, self.term)
             if agree and self.state=='"CANDIDATE"' and term==self.term:
                 
                 self.voteGranted[srcpid]=agree
                 if self.voteGranted.count(True) > self.n//2:
-                    print("*********Become Leader",self.pid)
                     self.becomeLeader()
                     
 ##        if msgtype=='AppendEntries':
