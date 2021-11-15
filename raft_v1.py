@@ -266,7 +266,7 @@ class Raft:
 ##                    if self.nextId[i] > len(self.log):
 ##                        continue
                     prevId = self.nextId[i] - 1
-                    lastId = len(self.log)
+                    lastId = min(prevId+1, len(self.log))
                     if self.matchId[i] <= self.nextId[i]:
                         lastId = prevId
                     prevTerm = self.logTerm(self.log, prevId)
