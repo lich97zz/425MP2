@@ -108,6 +108,18 @@ class Raft:
             self.logcontent.append(content)
             self.log.append(self.term)
             print('STATE log['+str(len(self.log))+']=['+str(self.term)+',"'+content+'"]' )
+
+            infodict = dict()
+            infodict['n']=self.n
+            infodict['pid']=self.pid
+            infodict['leader'] = self.leader
+            infodict['log'] = self.log
+            infodict['logcontent'] = self.logcontent
+            infodict['commitId'] = self.commitId
+            infodict['matchId'] = self.matchId
+            infodict['nextId'] = self.nextId
+            print("info:",infodict)
+
             return
     
         srcpid=int(msg[1])
@@ -221,8 +233,9 @@ class Raft:
                                 self.log = self.log[:-1]
 ##todo                                
                                 self.logcontent = self.logcontent[:-1]
+                            print("****info, logpushing:",entry[i],' ',content[i])
                             self.log.push(entry[i])
-##                            self.logcontent.push()
+                            self.logcontent.push(content[i])
                     matchId = ind
                     self.commitId = max(self.commitId, commitId)
                 
