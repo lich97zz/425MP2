@@ -234,8 +234,8 @@ class Raft:
                 for i in range(oldCommitId+1, self.commitId+1):
                     if i > len(self.log):
                         break
-                    
-                    print('COMMITTED '+str(self.logcontent[i-1])+' '+str(i))
+##                    print('COMMITTED '+str(self.logcontent[i-1])+' '+str(i))
+                    print('COMMITTED '+str(self.logcontent[i-1])+' '+str(0))
 
         if msgtype=='AppendEntriesResponse':
             def updateCommit():
