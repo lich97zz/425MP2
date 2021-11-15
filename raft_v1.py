@@ -250,7 +250,7 @@ class Raft:
             if self.term != term:
                 return
             agree = (msg[4]=='True')
-            matchId = msg[5]
+            matchId = int(msg[5])
             if agree:
                 self.matchId[srcpid] = max(self.matchId[srcpid], matchId)
                 self.nextId[srcpid] = matchId+1
