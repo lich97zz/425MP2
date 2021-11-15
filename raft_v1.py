@@ -231,21 +231,21 @@ class Raft:
             def updateCommit():
                 matchIdTmp = list(self.matchId.values())
                 matchIdTmp[self.pid] = len(self.log)
-                print(matchIdTmp)
+##                print(matchIdTmp)
                 matchIdTmp.sort()
                 ind = matchIdTmp[int(self.n/2)]
-                print('------Trying to update...')
-                print(matchIdTmp)
-                print(ind)
-                print(self.logTerm(self.log,ind), self.term)
+##                print('------Trying to update...')
+##                print(matchIdTmp)
+##                print(ind)
+##                print(self.logTerm(self.log,ind), self.term)
                 if self.state=='"LEADER"' and self.logTerm(self.log,ind)==self.term:
                     print("*********************Entered")
                     oldCommitId = self.commitId
-                    self.commitId = max(self.commitId, ind)
+                    self.commitId = max(self.commitId, ind)+1
                     
                     if self.commitId > oldCommitId:
                         print('STATE commitIndex='+str(self.commitId))
-                        for i in range(oldCommitId+1, self.commitId+1):
+                        for i in range(oldCommitId, self.commitId):
                             if i >= len(self.log):
                                 break
                             
