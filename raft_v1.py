@@ -30,6 +30,7 @@ class Raft:
         self.leader=None
 
         self.log=[]#modify2
+        self.logcontent=[]
         self.commitId = 0
         self.matchId=dict()
         self.nextId=dict()
@@ -121,7 +122,8 @@ class Raft:
             
             if self.term==term and (self.votedFor in {None,srcpid}):
                 #modify
-                cond1 = (lastLogTerm>self.logTerm(self.log,len(self.log)))
+                print("****info:",self.logTerm(self.log,len(self.log)))
+                cond1 = (lastLogTerm > self.logTerm(self.log,len(self.log)))
                 cond2 = (lastLogTerm==self.logTerm(self.log,len(self.log))) and (lastLogId>len(self.log))
                 if cond1 or cond2:
                 
@@ -194,7 +196,10 @@ class Raft:
                         if self.logTerm(self.log, ind) != entry[i].term:
                             while len(self.log) >= ind:
                                 self.log = self.log[:-1]
+##todo                                
+                                self.logcontent = self.logcontent[:-1]
                             self.log.push(entry[i])
+##                            self.logcontent.push()
                     matchId = ind
                     self.commitId = max(self.commitId, commitId)
                 
@@ -231,7 +236,6 @@ class Raft:
                     prevTerm = self.logTerm(self.log, prevId)
                     entry = self.log[prevId:lastId]
                     commitId = min(self.commitId, lastId)
-                    print("***INFO,",pid,",is sending heartbeat to,",i)
                     self.send(i,'AppendEntries',self.term, prevId, prevTerm, entry, commitId)
             l.release()
             time.sleep(self.ELECTION_TIMEOUT/4)
@@ -239,7 +243,6 @@ class Raft:
         l.release()
 
     def timeoutHandlerThread(self):
-        print(self.pid,"entering timeout")
         l.acquire()
         if self.timer==threading.current_thread():
             self.resetTimer()
@@ -257,7 +260,6 @@ class Raft:
                     #modify3
                     lastLogTerm = self.logTerm(self.log, len(self.log))
                     lastLogId = len(self.log)
-                    print("sending request Votes,",self.term,lastLogTerm,lastLogId)
                     self.send(i,'RequestVotes',self.term,lastLogTerm,lastLogId)
 
         l.release()
