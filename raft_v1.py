@@ -229,7 +229,7 @@ class Raft:
                     for i in range(len(entry)):
                         ind+=1
                         if self.logTerm(self.log, ind) != entry[i]:
-                            while len(self.log) >= ind:
+                            while len(self.log) > ind-1:
                                 self.log = self.log[:-1]
 ##todo                                
                                 self.logcontent = self.logcontent[:-1]
