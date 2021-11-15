@@ -146,7 +146,7 @@ class Raft:
                 
                 self.voteGranted[srcpid]=agree
                 if self.voteGranted.count(True) > self.n//2:
-                    print("*********Become Leader")
+                    print("*********Become Leader",self.pid)
                     self.becomeLeader()
                     
         if msgtype=='AppendEntries':

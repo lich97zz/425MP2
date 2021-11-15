@@ -229,11 +229,9 @@ class Raft:
 
 
     def msgHandler(self):
-        print("************enter handler")
         while msg:=sys.stdin.readline():
             l.acquire()
             self.processmsg(msg)
-            print("************release pos1")
             l.release()
 
 
@@ -244,10 +242,9 @@ class Raft:
         while self.term==term and self.status=='"LEADER"':
             for i in range(self.n):
                 if i!=self.pid:
-                    #modify3, 
-                    #self.send(i,'AppendEntries',self.term)
-                    if self.nextId[i] > len(self.log):
-                        continue
+                    #todo
+##                    if self.nextId[i] > len(self.log):
+##                        continue
                     prevId = self.nextId[i] - 1
                     lastId = len(self.log)
                     if self.matchId[i] <= self.nextId[i]:
