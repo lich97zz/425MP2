@@ -100,6 +100,18 @@ class Raft:
         self.heartbeat=threading.Thread(target=self.heartbeatThread,args=(self.term,))
         self.heartbeat.start()
 
+    def printinfo(self):
+        infodict = dict()
+        infodict['n']=self.n
+        infodict['pid']=self.pid
+        infodict['leader'] = self.leader
+        infodict['log'] = self.log
+        infodict['logcontent'] = self.logcontent
+        infodict['commitId'] = self.commitId
+        infodict['matchId'] = self.matchId
+        infodict['nextId'] = self.nextId
+        print("info:",infodict)
+        
     def processmsg(self,msg):
         msg=msg.split()
         
@@ -108,17 +120,8 @@ class Raft:
             self.logcontent.append(content)
             self.log.append(self.term)
             print('STATE log['+str(len(self.log))+']=['+str(self.term)+',"'+content+'"]' )
-
-            infodict = dict()
-            infodict['n']=self.n
-            infodict['pid']=self.pid
-            infodict['leader'] = self.leader
-            infodict['log'] = self.log
-            infodict['logcontent'] = self.logcontent
-            infodict['commitId'] = self.commitId
-            infodict['matchId'] = self.matchId
-            infodict['nextId'] = self.nextId
-            print("info:",infodict)
+        
+            self.printinfo()
 
             return
     
@@ -226,8 +229,12 @@ class Raft:
                 if cond1 or cond2:
                     success=True
                     ind = prevId
+
+                    print("-----info1,",entry,ind)
+                    print("-----log,",self.log,self.logcontent)
                     for i in range(len(entry)):
                         ind+=1
+                        print("-----info2,",self.logTerm(self.log, ind),i)
                         if self.logTerm(self.log, ind) != entry[i]:
                             while len(self.log) > ind-1:
                                 self.log = self.log[:-1]
