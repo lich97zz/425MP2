@@ -136,8 +136,8 @@ class Raft:
 ##            print("entering requestVotes handler")
 ##self.send(i,'RequestVotes',self.term,lastLogTerm,LastLogId)
             #modify
-            lastLogTerm = int(msg[4])
-            lastLogId = int(msg[5])
+##            lastLogTerm = int(msg[4])
+##            lastLogId = int(msg[5])
             
             agree=False
             
