@@ -178,14 +178,14 @@ class Raft:
             prevId = int(msg[4])
             prevTerm = int(msg[5])
             
-            tmp = msg[6][1:-1].split('')
+            tmp = msg[6][1:-1].split(',')
             entry = []
             for elm in tmp:
                 if elm == '':
                     continue
                 entry.append(int(elm))
 
-            tmp = msg[6][1:-1].split('')
+            tmp = msg[6][1:-1].split(',')
             content = []
             for elm in tmp:
                 if elm == '':
