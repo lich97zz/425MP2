@@ -190,6 +190,9 @@ class Raft:
 ##            
 ##            self.send(srcpid,'AppendEntriesResponse',self.term,success)
         if msgtype=='AppendEntries':
+            print("in appendentryhandler,",msg)
+            print("  in appendentryhandler,",msg[6])
+            
             prevId = int(msg[4])
             prevTerm = int(msg[5])
             
@@ -200,13 +203,17 @@ class Raft:
                     continue
                 entry.append(int(elm))
 
+            print("  in appendentryhandler,",entry)
+
             tmp = msg[6][1:-1].split(',')
             content = []
             for elm in tmp:
                 if elm == '':
                     continue
-                entry.append(elm)
-
+                content.append(elm)
+                
+            
+            
             commitId = int(msg[8])
 
             success=False
