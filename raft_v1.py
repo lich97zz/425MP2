@@ -59,7 +59,7 @@ class Raft:
     def logTerm(self, log, ind):
         if ind<1 or ind>len(log):
             return 0
-        return log[ind-1].term
+        return log[ind-1]
 
     def resetTimer(self):
         
