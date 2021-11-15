@@ -248,8 +248,8 @@ class Raft:
 ##todo                                
                                 self.logcontent = self.logcontent[:-1]
                             print("****info, logpushing:",entry[i],' ',content[i])
-                            self.log.push(entry[i])
-                            self.logcontent.push(content[i])
+                            self.log.append(entry[i])
+                            self.logcontent.append(content[i])
                     matchId = ind
                     self.commitId = max(self.commitId, commitId)
                 
