@@ -226,8 +226,8 @@ class Raft:
                 if i!=self.pid:
                     #modify3, 
                     #self.send(i,'AppendEntries',self.term)
-                    if self.nextId[i] > len(self.log):
-                        continue
+##                    if self.nextId[i] > len(self.log):
+##                        continue
                     prevId = self.nextId[i] - 1
                     lastId = len(self.log)
                     if self.matchId[i] <= self.nextId[i]:
