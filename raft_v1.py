@@ -113,6 +113,7 @@ class Raft:
         print("info:",infodict)
         
     def updateCommit(self):
+##        print("inside updateCommit")
         matchIdTmp = list(self.matchId.values())
         matchIdTmp[self.pid] = len(self.log)
 ##                print(matchIdTmp)
@@ -251,8 +252,16 @@ class Raft:
                             
                             print('STATE log['+str(len(self.log))+']=['+str(self.term)+',"'+content[i]+'"]' )
                     matchId = ind
+                    print("--Commitid Change", self.commitId, commitId)
+                    oldCommitId = self.commitId
+                    self.commitId = max(self.commitId, commitId)
+                    if self.commitId > oldCommitId:
+                        print('STATE commitIndex='+str(self.commitId))
+                        for i in range(oldCommitId+1, self.commitId+1):
+                            if i > len(self.log):
+                                break
+                            print('COMMITTED '+str(self.logcontent[i-1])+' '+str(i))
 
-            b1 = self.updateCommit()
             
             print("-------appendEntry commit id change =",b1)
             self.send(srcpid,'AppendEntriesResponse',self.term,success, matchId)
