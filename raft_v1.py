@@ -228,7 +228,7 @@ class Raft:
                     ind = prevId
                     for i in range(len(entry)):
                         ind+=1
-                        if self.logTerm(self.log, ind) != entry[i].term:
+                        if self.logTerm(self.log, ind) != entry[i]:
                             while len(self.log) >= ind:
                                 self.log = self.log[:-1]
 ##todo                                
