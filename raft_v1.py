@@ -34,26 +34,19 @@ class Raft:
         self.commitId = 0
         self.matchId=dict()
         self.nextId=dict()
-##        self.rpcDue=dict()
-##        self.hbDue=dict()
         for i in range(n):
             self.matchId[i]=0
             self.nextId[i]=1
-##            self.rpcDue[i]=0
-##            self.hbDue[i]=0
         #end of modify2
             
         self.votedFor=pid
         self.term=0
         print(f'STATE',f'term={self.term}')
 
-
         self.voteGranted=[False]*n
         self.ELECTION_TIMEOUT=1
-
         self.timer=None
         self.resetTimer()
-
         self.heartbeat=None
         
     def logTerm(self, log, ind):
@@ -62,9 +55,7 @@ class Raft:
         return log[ind-1]
 
     def resetTimer(self):
-        
         #fix concurrency issue
-        
         self.timer=threading.Timer(self.ELECTION_TIMEOUT*(1+random()),self.timeoutHandlerThread)
         self.timer.start()
 
@@ -82,11 +73,6 @@ class Raft:
         #  if self.heartbeat:
         #     self.heartbeat.cancel()
         
-
-
-        
-
-    
     def send(self,destpid,*args):
         print('SEND',destpid,*args,flush=True)
     
@@ -113,29 +99,19 @@ class Raft:
         print("info:",infodict)
         
     def updateCommit(self):
-##        print("inside updateCommit")
         matchIdTmp = list(self.matchId.values())
         matchIdTmp[self.pid] = len(self.log)
-##                print(matchIdTmp)
         matchIdTmp.sort()
         ind = matchIdTmp[int(self.n/2)]
-##                print('------Trying to update...')
-##                print(matchIdTmp)
-##                print(ind)
-##                print(self.logTerm(self.log,ind), self.term)
         if self.state=='"LEADER"' and self.logTerm(self.log,ind)==self.term:
-##                    print("*********************Entered")
             oldCommitId = self.commitId
             self.commitId = max(self.commitId, ind)
-##                    print(oldCommitId,self.commitId)
             if self.commitId > oldCommitId:
                 print('STATE commitIndex='+str(self.commitId))
                 for i in range(oldCommitId+1, self.commitId+1):
                     if i > len(self.log):
                         break
                     print('COMMITTED '+str(self.logcontent[i-1])+' '+str(i))
-                return True
-        return False
         
     def processmsg(self,msg):
         msg=msg.split()
@@ -145,9 +121,6 @@ class Raft:
             self.logcontent.append(content)
             self.log.append(self.term)
             print('STATE log['+str(len(self.log))+']=['+str(self.term)+',"'+content+'"]' )
-        
-##            self.printinfo()
-
             return
     
         srcpid=int(msg[1])
@@ -163,14 +136,13 @@ class Raft:
 ##            print("entering requestVotes handler")
 ##self.send(i,'RequestVotes',self.term,lastLogTerm,LastLogId)
             #modify
-##            lastLogTerm = int(msg[4])
-##            lastLogId = int(msg[5])
+            lastLogTerm = int(msg[4])
+            lastLogId = int(msg[5])
             
             agree=False
             
             if self.term==term and (self.votedFor in {None,srcpid}):
-                #modify
-                
+              #modify4  
 ##                print("****info:",lastLogTerm,self.logTerm(self.log,len(self.log)))
 ##                cond1 = (lastLogTerm > self.logTerm(self.log,len(self.log)))
 ##                cond2 = (lastLogTerm==self.logTerm(self.log,len(self.log))) and (lastLogId>len(self.log))
@@ -222,17 +194,13 @@ class Raft:
             matchId = 0
 
             if self.term==term:
-                
                 self.state='"FOLLOWER"'
                 print(f'STATE',f'state={self.state}')
-                
+                self.resetTimer()
                 if self.leader!=srcpid:
                     self.leader=srcpid
                     print(f'STATE',f'leader={self.leader}')
 
-                self.resetTimer()
-                
-            #modify3
                 cond1 = (prevId==0)
                 cond2 = (prevId<=len(self.log) and (self.logTerm(self.log, prevId)==prevTerm))
                 if cond1 or cond2:
@@ -246,13 +214,11 @@ class Raft:
                                 self.log = self.log[:-1]
                                 self.logcontent = self.logcontent[:-1]
                             content[i] = content[i][1:-1] #remove the leading and tail '
-##                            print("****info, logpushing:",entry[i],' ',content[i],' at ',self.pid)
                             self.log.append(entry[i])
                             self.logcontent.append(content[i])
-                            
                             print('STATE log['+str(len(self.log))+']=['+str(self.term)+',"'+content[i]+'"]' )
+
                     matchId = ind
-                    print("--Commitid Change", self.commitId, commitId)
                     oldCommitId = self.commitId
                     self.commitId = max(self.commitId, commitId)
                     if self.commitId > oldCommitId:
@@ -262,13 +228,9 @@ class Raft:
                                 break
                             print('COMMITTED '+str(self.logcontent[i-1])+' '+str(i))
 
-            
             self.send(srcpid,'AppendEntriesResponse',self.term,success, matchId)
-            
 
         if msgtype=='AppendEntriesResponse':
-            
-##  self.send(srcpid,'AppendEntriesResponse',self.term,success, matchId)
             if self.state!='"LEADER"':
                 return
             if self.term != term:
@@ -281,18 +243,12 @@ class Raft:
                 self.updateCommit()
             else:
                 self.nextId[srcpid] = max(1, self.nextId[srcpid]-1)
-            
-    
-    
-
 
     def msgHandler(self):
         while msg:=sys.stdin.readline():
             l.acquire()
             self.processmsg(msg)
             l.release()
-
-
 
     def heartbeatThread(self,term):
         l.acquire()
@@ -301,8 +257,8 @@ class Raft:
             for i in range(self.n):
                 if i!=self.pid:
                     #todo
-##                    if self.nextId[i] > len(self.log):
-##                        continue
+                    #if HeartBeat timeout, or self.nextId[i] <= len(self.log), do the following...
+
                     prevId = self.nextId[i] - 1
                     lastId = min(prevId+1, len(self.log))
                     if self.matchId[i] < self.nextId[i]-1:
@@ -311,7 +267,6 @@ class Raft:
                     entry = self.log[prevId:lastId]
                     content = self.logcontent[prevId:lastId]
                     commitId = min(self.commitId, lastId)
-##                    print("(((((,entry=",entry)
                     self.send(i,'AppendEntries',self.term, prevId, prevTerm, entry, content, commitId)
             l.release()
             time.sleep(self.ELECTION_TIMEOUT/4)
