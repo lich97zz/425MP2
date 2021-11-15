@@ -172,27 +172,7 @@ class Raft:
                 if self.voteGranted.count(True) > self.n//2:
                     self.becomeLeader()
                     
-##        if msgtype=='AppendEntries':
-##            
-##            success=False
-##            if self.term==term:
-##                self.state='"FOLLOWER"'
-##                print(f'STATE',f'state={self.state}')
-##                
-##                if self.leader!=srcpid:
-##                    self.leader=srcpid
-##                    print(f'STATE',f'leader={self.leader}')
-##                
-##                
-##
-##                success=True
-##                self.resetTimer()
-##            
-##            self.send(srcpid,'AppendEntriesResponse',self.term,success)
         if msgtype=='AppendEntries':
-##            print("in appendentryhandler,",msg)
-##            print("  in appendentryhandler,",msg[6])
-            
             prevId = int(msg[4])
             prevTerm = int(msg[5])
             
@@ -203,8 +183,6 @@ class Raft:
                     continue
                 entry.append(int(elm))
 
-##            print("  in appendentryhandler,",entry)
-
             tmp = msg[7][1:-1].split(',')
             content = []
             for elm in tmp:
@@ -212,10 +190,8 @@ class Raft:
                     continue
                 content.append(elm)
                 
-            
-            
             commitId = int(msg[8])
-
+            
             success=False
             matchId = 0
 
@@ -236,28 +212,51 @@ class Raft:
                 if cond1 or cond2:
                     success=True
                     ind = prevId
-
-##                    print("-----info1,",entry,ind)
-##                    print("-----log,",self.log,self.logcontent)
+                    
                     for i in range(len(entry)):
                         ind+=1
-##                        print("-----info2,",self.logTerm(self.log, ind),i)
                         if self.logTerm(self.log, ind) != entry[i]:
                             while len(self.log) > ind-1:
                                 self.log = self.log[:-1]
-##todo                                
                                 self.logcontent = self.logcontent[:-1]
                             print("****info, logpushing:",entry[i],' ',content[i],' at ',self.pid)
                             self.log.append(entry[i])
                             self.logcontent.append(content[i])
                     matchId = ind
                     self.commitId = max(self.commitId, commitId)
-                
             
             self.send(srcpid,'AppendEntriesResponse',self.term,success, matchId)
 
         if msgtype=='AppendEntriesResponse':
-            pass
+            def updateCommit():
+                matchIdTmp = list(self.matchId.values())
+                matchIdTmp.append(len(self.log))
+                matchIdTmp.sort()
+                ind = matchIdTmp[int(self.n/2)]
+                if self.state == '"LEADER"' and self.logTerm(self.log,n)==self.term:
+                    oldCommitId = self.commitId
+                    self.commitId = max(self.commitId, n)
+                    if self.commitedId > oldCommitId:
+                        print('STATE commitIndex='+str(self.commitId))
+                        for i in range(oldCommitId+1, self.commitId+1):
+                            if i >= len(self.log):
+                                break
+                            
+                            print('COMMITTED '+str(self.logcontent[i])+' '+str(i))
+                
+##  self.send(srcpid,'AppendEntriesResponse',self.term,success, matchId)
+            if self.state!='"LEADER"':
+                return
+            if self.term != term:
+                return
+            agree = (msg[4]=='True')
+            matchId = msg[5]
+            if agree:
+                self.matchId[srcpid] = max(self.matchId[srcpid], matchId)
+                self.nextId[srcpid] = matchId+1
+            else:
+                self.nextId[srcpid] = max(1, self.nextId[srcpid]-1)
+            updateCommit()
     
     
 
