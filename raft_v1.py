@@ -230,7 +230,7 @@ class Raft:
         if msgtype=='AppendEntriesResponse':
             def updateCommit():
                 matchIdTmp = list(self.matchId.values())
-                matchIdTmp.append(len(self.log))
+                matchIdTmp[self.pid] = len(self.log)
                 print(matchIdTmp)
                 matchIdTmp.sort()
                 ind = matchIdTmp[int(self.n/2)]
@@ -259,9 +259,10 @@ class Raft:
             if agree:
                 self.matchId[srcpid] = max(self.matchId[srcpid], matchId)
                 self.nextId[srcpid] = matchId+1
+                updateCommit()
             else:
                 self.nextId[srcpid] = max(1, self.nextId[srcpid]-1)
-            updateCommit()
+            
     
     
 
