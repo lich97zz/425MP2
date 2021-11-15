@@ -122,7 +122,8 @@ class Raft:
             
             if self.term==term and (self.votedFor in {None,srcpid}):
                 #modify
-                print("****info:",self.logTerm(self.log,len(self.log)))
+                
+                print("****info:",lastLogTerm,self.logTerm(self.log,len(self.log)))
                 cond1 = (lastLogTerm > self.logTerm(self.log,len(self.log)))
                 cond2 = (lastLogTerm==self.logTerm(self.log,len(self.log))) and (lastLogId>len(self.log))
                 if cond1 or cond2:
