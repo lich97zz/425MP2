@@ -263,7 +263,6 @@ class Raft:
                             print('COMMITTED '+str(self.logcontent[i-1])+' '+str(i))
 
             
-            print("-------appendEntry commit id change =",b1)
             self.send(srcpid,'AppendEntriesResponse',self.term,success, matchId)
             
 
