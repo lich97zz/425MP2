@@ -153,6 +153,7 @@ class Raft:
     def heartbeatThread(self,term):
         l.acquire()
         while self.term==term:
+            print(self.pid,"sending a heartbeat")
             for i in range(self.n):
                 if i!=self.pid:
                     self.send(i,'AppendEntries',self.term)
