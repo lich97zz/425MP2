@@ -253,8 +253,8 @@ class Raft:
                     matchId = ind
 
             b1 = self.updateCommit()
-            if (!b1):
-                print("-------appendEntry commit id change =",b1)
+            
+            print("-------appendEntry commit id change =",b1)
             self.send(srcpid,'AppendEntriesResponse',self.term,success, matchId)
             
 
