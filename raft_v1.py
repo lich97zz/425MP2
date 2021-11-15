@@ -121,7 +121,7 @@ class Raft:
             self.log.append(self.term)
             print('STATE log['+str(len(self.log))+']=['+str(self.term)+',"'+content+'"]' )
         
-            self.printinfo()
+##            self.printinfo()
 
             return
     
@@ -231,9 +231,14 @@ class Raft:
             def updateCommit():
                 matchIdTmp = list(self.matchId.values())
                 matchIdTmp.append(len(self.log))
+                print(matchIdTmp)
                 matchIdTmp.sort()
                 ind = matchIdTmp[int(self.n/2)]
-                if self.state == '"LEADER"' and self.logTerm(self.log,n)==self.term:
+                print('------Trying to update...')
+                print(matchIdTmp)
+                print(ind)
+                print(self.logTerm(self.log,n), self.term)
+                if self.state=='"LEADER"' and self.logTerm(self.log,n)==self.term:
                     oldCommitId = self.commitId
                     self.commitId = max(self.commitId, n)
                     if self.commitedId > oldCommitId:
