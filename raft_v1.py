@@ -149,60 +149,60 @@ class Raft:
                     print("*********Become Leader",self.pid)
                     self.becomeLeader()
                     
-        if msgtype=='AppendEntries':
-            
-            success=False
-            if self.term==term:
-                self.state='"FOLLOWER"'
-                print(f'STATE',f'state={self.state}')
-                
-                if self.leader!=srcpid:
-                    self.leader=srcpid
-                    print(f'STATE',f'leader={self.leader}')
-                
-                
-
-                success=True
-                self.resetTimer()
-            
-            self.send(srcpid,'AppendEntriesResponse',self.term,success)
 ##        if msgtype=='AppendEntries':
-##            prevId = msg[4]
-##            prevTerm = msg[5]
-##            entry = msg[6]
-##            commitId = msg[7]
-##
+##            
 ##            success=False
-##            matchId = 0
-##
 ##            if self.term==term:
-##                
 ##                self.state='"FOLLOWER"'
 ##                print(f'STATE',f'state={self.state}')
 ##                
 ##                if self.leader!=srcpid:
 ##                    self.leader=srcpid
 ##                    print(f'STATE',f'leader={self.leader}')
+##                
+##                
 ##
+##                success=True
 ##                self.resetTimer()
-##                
-##            #modify3
-##                cond1 = (prevId==0)
-##                cond2 = (prevId<=len(self.log) and (self.logTerm(self.log, prevId)==prevTerm))
-##                if cond1 or cond2:
-##                    success=True
-##                    ind = prevId
-##                    for i in range(len(entry)):
-##                        ind+=1
-##                        if self.logTerm(self.log, ind) != entry[i].term:
-##                            while len(self.log) >= ind:
-##                                self.log = self.log[:-1]
-##                            self.log.push(entry[i])
-##                    matchId = ind
-##                    self.commitId = max(self.commitId, commitId)
-##                
 ##            
-##            self.send(srcpid,'AppendEntriesResponse',self.term,success, matchId)
+##            self.send(srcpid,'AppendEntriesResponse',self.term,success)
+        if msgtype=='AppendEntries':
+            prevId = msg[4]
+            prevTerm = msg[5]
+            entry = msg[6]
+            commitId = msg[7]
+
+            success=False
+            matchId = 0
+
+            if self.term==term:
+                
+                self.state='"FOLLOWER"'
+                print(f'STATE',f'state={self.state}')
+                
+                if self.leader!=srcpid:
+                    self.leader=srcpid
+                    print(f'STATE',f'leader={self.leader}')
+
+                self.resetTimer()
+                
+            #modify3
+                cond1 = (prevId==0)
+                cond2 = (prevId<=len(self.log) and (self.logTerm(self.log, prevId)==prevTerm))
+                if cond1 or cond2:
+                    success=True
+                    ind = prevId
+                    for i in range(len(entry)):
+                        ind+=1
+                        if self.logTerm(self.log, ind) != entry[i].term:
+                            while len(self.log) >= ind:
+                                self.log = self.log[:-1]
+                            self.log.push(entry[i])
+                    matchId = ind
+                    self.commitId = max(self.commitId, commitId)
+                
+            
+            self.send(srcpid,'AppendEntriesResponse',self.term,success, matchId)
 
         if msgtype=='AppendEntriesResponse':
             pass
@@ -224,8 +224,7 @@ class Raft:
         while self.term==term and self.state=='"LEADER"':
             for i in range(self.n):
                 if i!=self.pid:
-                    #modify3, 
-                    #self.send(i,'AppendEntries',self.term)
+                    #todo
 ##                    if self.nextId[i] > len(self.log):
 ##                        continue
                     prevId = self.nextId[i] - 1
