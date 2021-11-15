@@ -102,6 +102,14 @@ class Raft:
 
     def processmsg(self,msg):
         msg=msg.split()
+        
+        if msg[0]=='LOG':
+            content=msg[1]
+            self.logcontent.append(content)
+            self.log.append(self.term)
+            print('STATE log['+str(len(self.log))+']=['+str(self.term)+',"'+content+'"]' )
+            return
+    
         srcpid=int(msg[1])
         msgtype=msg[2]
         
@@ -169,9 +177,22 @@ class Raft:
         if msgtype=='AppendEntries':
             prevId = int(msg[4])
             prevTerm = int(msg[5])
-            entry = msg[6]
-            print("*****Entry:",entry)
-            commitId = int(msg[7])
+            
+            tmp = msg[6][1:-1].split('')
+            entry = []
+            for elm in tmp:
+                if elm == '':
+                    continue
+                entry.append(int(elm))
+
+            tmp = msg[6][1:-1].split('')
+            content = []
+            for elm in tmp:
+                if elm == '':
+                    continue
+                entry.append(elm)
+
+            commitId = int(msg[8])
 
             success=False
             matchId = 0
@@ -237,8 +258,9 @@ class Raft:
                         lastId = prevId
                     prevTerm = self.logTerm(self.log, prevId)
                     entry = self.log[prevId:lastId]
+                    content = self.logcontent[prevId:lastId]
                     commitId = min(self.commitId, lastId)
-                    self.send(i,'AppendEntries',self.term, prevId, prevTerm, entry, commitId)
+                    self.send(i,'AppendEntries',self.term, prevId, prevTerm, entry, content, commitId)
             l.release()
             time.sleep(self.ELECTION_TIMEOUT/4)
             l.acquire()
