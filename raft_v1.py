@@ -237,8 +237,8 @@ class Raft:
                 print('------Trying to update...')
                 print(matchIdTmp)
                 print(ind)
-                print(self.logTerm(self.log,n), self.term)
-                if self.state=='"LEADER"' and self.logTerm(self.log,n)==self.term:
+                print(self.logTerm(self.log,ind), self.term)
+                if self.state=='"LEADER"' and self.logTerm(self.log,ind)==self.term:
                     print("*********************Entered")
                     oldCommitId = self.commitId
                     self.commitId = max(self.commitId, ind)
