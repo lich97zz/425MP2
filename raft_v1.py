@@ -117,7 +117,10 @@ class Raft:
         msg=msg.split()
         
         if msg[0]=='LOG':
+            
             content=msg[1]
+            print("************content,",content)
+            print("************content,",msg)
             self.logcontent.append(content)
             self.log.append(self.term)
             print('STATE log['+str(len(self.log))+']=['+str(self.term)+',"'+content+'"]' )
