@@ -123,9 +123,9 @@ class Raft:
             self.logcontent.append(content)
             self.log.append(self.term)
             print('STATE log['+str(len(self.log))+']=['+str(self.term)+',"'+content+'"]' )
-            if(len(self.log)>=3):
-                print("************content,",self.log)
-                print("************content,",self.logcontent)
+##            if(len(self.log)>=3):
+##                print("************content,",self.log)
+##                print("************content,",self.logcontent)
             return
     
         srcpid=int(msg[1])
@@ -283,7 +283,7 @@ class Raft:
             return
         l.acquire()
         if self.timer==threading.current_thread():
-            print("***********timeout")
+##            print("***********timeout")
             self.resetTimer()
             self.term+=1
             print(f'STATE',f'term={self.term}')
