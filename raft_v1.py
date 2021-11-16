@@ -56,7 +56,8 @@ class Raft:
 
     def resetTimer(self):
         #fix concurrency issue
-        self.timer=threading.Timer(self.ELECTION_TIMEOUT*(1+random()),self.timeoutHandlerThread)
+        #modify
+        self.timer=threading.Timer(self.ELECTION_TIMEOUT*(2+random()),self.timeoutHandlerThread)
         self.timer.start()
 
 
@@ -281,6 +282,7 @@ class Raft:
     def timeoutHandlerThread(self):
         l.acquire()
         if self.timer==threading.current_thread():
+            print("***********timeout")
             self.resetTimer()
             self.term+=1
             print(f'STATE',f'term={self.term}')
