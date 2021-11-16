@@ -16,6 +16,9 @@ async def check_entries(group,term,leader,entries,offset=0):
     if len(group.logs[leader]) != len(entries) + offset or not all(i in group.logs[leader] for i in indices):
         await alog.log(ERROR, f"### Expected leader log to have {offset+len(entries)} entries")
     elif not all(group.logs[leader][i][0] == term for i in indices):
+        print("------ERR", term)
+        for i in indices:
+            print(i,group.logs[leader][i][0])
         await alog.log(ERROR, f"### Expected leader log to have entries from term {term}")
     elif { group.logs[leader][i][1] for i in indices } != set(entries):
         await alog.log(ERROR, f"### Leader log contains incorrect entries")

@@ -117,13 +117,15 @@ class Raft:
         msg=msg.split()
         
         if msg[0]=='LOG':
-            
             content=msg[1]
-            print("************content,",content)
-            print("************content,",msg)
+##            print("************content,",content)
+##            print("************content,",msg)
             self.logcontent.append(content)
             self.log.append(self.term)
             print('STATE log['+str(len(self.log))+']=['+str(self.term)+',"'+content+'"]' )
+            if(len(self.log)>=3):
+                print("************content,",self.log)
+                print("************content,",self.logcontent)
             return
     
         srcpid=int(msg[1])
