@@ -1,0 +1,34 @@
+改动:
+#campuswire 674允许了增加更多的stdout parameters，在line 270,296处send了更多parameter(末尾[])
+    new-->self.send(i,'RequestVotes',self.term, [lastLogTerm,lastLogId])
+    new-->self.send(i,'AppendEntries',self.term, [prevId, prevTerm, entry, content, commitId])
+
+line32-39新增了member variable
+line52新增logTerm, 同raft.js
+line101新增updateCommit, 逻辑同raft.js的advanceCommit, 用作leader的commitid更新以及stdout输出
+line119新增LOG的输出(处理新增log的LOG msg)
+line174 appendEntries 同raft.js
+line233 appendEntriesResponse, 同raft.js
+line262 heartbeat发出去的appendEntries 增加了参数(line270)
+
+情况:
+可以通过simple log test,(命令 python3 raft_simple_log_test.py 10 python3 raft_v1.py) 但是复杂的log估计有问题，等新的testcase出来再试试(可能要修复下面的逻辑缺失问题)
+
+逻辑缺失:
+heartbeatthread todo:
+line 259,
+    if timeout, or self.nextId[i] <= len(self.log), do the following...
+    raft.js那个参考程序里有这么一段条件，如果heartbeat timeout 或者self.nextId[i] <= len(self.log)时发送heartbeat,现在的程序相当于只在heartbeat timeout时候发heartbeat
+   
+
+rule on select leader(vote) need to modify
+line292(send), 139,145(receive)
+    raft.js里的RequestVotes逻辑稍微复杂一些，在特定情况下(比如他的log比较不全)某些node不能成为leader，去掉这两部分的注释会增加这部分的判断(还没有调试过 只是简单复制了raft.js的逻辑)，同时send出去的参数会变多
+    old-->self.send(i,'RequestVotes',self.term)
+    new-->self.send(i,'RequestVotes',self.term,lastLogTerm,lastLogId)
+    
+stdout issue, more parameters than needed
+line 270, 296
+    #campuswire 674允许了增加更多的stdout parameters，在line 270,296处send了更多parameter(末尾[])
+    new-->self.send(i,'RequestVotes',self.term, [lastLogTerm,lastLogId])
+    new-->self.send(i,'AppendEntries',self.term, [prevId, prevTerm, entry, content, commitId])
